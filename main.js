@@ -85,16 +85,6 @@ Carousel.prototype = {
     }
   },
 
-  swipeStartHandler(e) {
-    this.startPosX = e instanceof MouseEvent ? e.pageX : e.changedTouches[0].pageX
-  },
-
-  swipeEndHandler(e) {
-    this.endPosX = e instanceof MouseEvent ? e.pageX : e.changedTouches[0].pageX
-    if (this.endPosX - this.startPosX > 100) this.prevHandler()
-    if (this.endPosX - this.startPosX < -100) this.nextHandler()
-  },
-
   initListeners() {
     this.pauseButton.addEventListener('click', this.pausePlayHandler.bind(this))
     this.previousButton.addEventListener('click', this.prevHandler.bind(this))
@@ -114,6 +104,26 @@ Carousel.prototype = {
 }
 
 Carousel.prototype.constructor = Carousel
+
+function SwipeCarousel() {
+  Carousel.apply(this, arguments)
+}
+
+SwipeCarousel.prototype = Object.create(Carousel.prototype)
+SwipeCarousel.prototype.constructor = SwipeCarousel
+
+SwipeCarousel.prototype.swipeStartHandler(e) {
+  swipeStartHandler(e) 
+    this.startPosX = e instanceof MouseEvent ? e.pageX : e.changedTouches[0].pageX
+}
+
+swipeEndHandler(e) {
+  this.endPosX = e instanceof MouseEvent ? e.pageX : e.changedTouches[0].pageX
+  if (this.endPosX - this.startPosX > 100) this.prevHandler()
+  if (this.endPosX - this.startPosX < -100) this.nextHandler()
+},
+
+
 
 const carousel = new Carousel()
 carousel.init()
