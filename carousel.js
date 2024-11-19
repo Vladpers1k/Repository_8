@@ -1,24 +1,52 @@
 function Carousel(containerId = '#carousel', slideId = '.slide', interval = 2000, isPlaying = true) {
   this.container = document.querySelector(containerId)
-  this.slides = this.container.querySelectorAll('.slide')
+  this.slides = this.container.querySelectorAll(slideId)
   this.INTERVAL = interval
-  this.isPlaying = true
+  this.isPlaying = isPlaying
 }
 
 Carousel.prototype = {
   _initProps() {
     this.currentSlide = 0
-
-    this.indicatorsContainer = this.container.querySelector('#indicators-container')
-    this.indicatorItems = this.container.querySelectorAll('.indicator')
-    this.pauseButton = this.container.querySelector('#pause-btn')
-    this.previousButton = this.container.querySelector('#prev-btn')
-    this.nextButton = this.container.querySelector('#next-btn')
-
+    this.SLIDES_COUNT = this.slides.length
     this.CODE_ARROW_LEFT = 'ArrowLeft'
     this.CODE_ARROW_RIGHT = 'ArrowRight'
     this.CODE_SPACE = 'Space'
-    this.INTERVAL = 2000
+  },
+
+  _initControls() {
+    const controls = document.createElement('div')
+    const PAUSE = '<div id="pause-btn" class="control control-pause">Pause</div>'
+    const PREV = '<div id="prev-btn" class="control control-prev">Prev</div>'
+    const NEXT = '<div id="next-btn" class="control control-next">Next</div>'
+
+    controls.innerHTML = PAUSE + PREV + NEXT
+    controls.setAttribute('id', 'controls-container')
+    controls.setAttribute('class', 'controls')
+    this.container.append(controls)
+
+    this.pauseButton = this.container.querySelector('#pause-btn')
+    this.previousButton = this.container.querySelector('#prev-btn')
+    this.nextButton = this.container.querySelector('#next-btn')
+  },
+
+  _initIndicators() {
+    const indicators = document.createElement('div')
+
+    indicators.setAttribute('id', 'indicators-container')
+    indicators.setAttribute('class', 'indicators')
+
+    for (let i = 0; i < this.SLIDES_COUNT; i++) {
+      const indicator = document.createElement('div')
+      indicator.setAttribute('class', i === 0 ? 'indicator active' : 'indicator')
+      indicator.dataset.slideTo = i
+      indicators.append(indicator)
+    }
+
+    this.container.append(indicators)
+
+    this.indicatorsContainer = this.container.querySelector('#indicators-container')
+    this.indicatorItems = this.container.querySelectorAll('.indicator')
   },
 
   _initListeners() {
@@ -32,7 +60,7 @@ Carousel.prototype = {
   _gotoNth(n) {
     this.slides[this.currentSlide].classList.toggle('active')
     this.indicatorItems[this.currentSlide].classList.toggle('active')
-    this.currentSlide = (n + this.slides.length) % this.slides.length
+    this.currentSlide = (n + this.SLIDES_COUNT) % this.SLIDES_COUNT
     this.slides[this.currentSlide].classList.toggle('active')
     this.indicatorItems[this.currentSlide].classList.toggle('active')
   },
@@ -75,7 +103,7 @@ Carousel.prototype = {
   },
 
   play() {
-    this.pauseButton.textContent = 'pause'
+    this.pauseButton.textContent = 'Pause'
     this.isPlaying = !this.isPlaying
     this._tick()
   },
@@ -96,8 +124,10 @@ Carousel.prototype = {
 
   init() {
     this._initProps()
+    this._initControls()
+    this._initIndicators()
     this._initListeners()
-    this._tick()
+    if (this.isPlaying) this._tick()
   }
 }
 
