@@ -1,9 +1,10 @@
 class Carousel {
-  constructor(containerId = '#carousel', slideId = '.slide', interval = 2000, isPlaying = true) {
-    this.container = document.querySelector(containerId)
-    this.slideItems = this.container.querySelectorAll(slideId)
-    this.INTERVAL = interval
-    this.isPlaying = isPlaying
+  constructor(p) {
+    const settings = { ...{ containerId: '#carousel', slideId: '.slide', interval: 2000, isPlaying: true }, ...p }
+    this.container = document.querySelector(settings.containerId)
+    this.slideItems = this.container.querySelectorAll(settings.slideId)
+    this.INTERVAL = settings.interval
+    this.isPlaying = settings.isPlaying
   }
 
   _initProps() {
@@ -55,6 +56,8 @@ class Carousel {
     this.nextButton.addEventListener('click', this.next.bind(this))
     this.indicatorsContainer.addEventListener('click', this._indicate.bind(this))
     document.addEventListener('keydown', this._pressKey.bind(this))
+    this.container.addEventListener('mouseenter', this.pause.bind(this))
+    this.container.addEventListener('mouseleave', this.play.bind(this))
   }
 
   _gotoNth(n) {
@@ -74,6 +77,8 @@ class Carousel {
   }
 
   _tick() {
+    if (!this.isPlaying) return
+    if (this.timerID) return
     this.timerID = setInterval(() => this._gotoNext(), this.INTERVAL)
   }
 
@@ -98,13 +103,15 @@ class Carousel {
   pause() {
     if (!this.isPlaying) return
     this.pauseButton.textContent = 'Play'
-    this.isPlaying = !this.isPlaying
+    this.isPlaying = false
     clearInterval(this.timerID)
+    this.timerID = null
   }
 
   play() {
+    if (this.isPlaying) return
     this.pauseButton.textContent = 'Pause'
-    this.isPlaying = !this.isPlaying
+    this.isPlaying = true
     this._tick()
   }
 
